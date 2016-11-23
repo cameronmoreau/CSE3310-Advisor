@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom';
 
 import { Router, Route, Redirect, browserHistory } from 'react-router';
 
-import App from './App';
-
 import Login from './components/login/Login';
 import Dashboard from './components/dashboard/Dashboard';
 
