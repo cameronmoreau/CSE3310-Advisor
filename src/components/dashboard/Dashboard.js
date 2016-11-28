@@ -7,6 +7,13 @@ import {
 import '../../css/Dashboard.css';
 import { apiCall } from '../../services/api';
 
+import Pusher from 'pusher-js';
+Pusher.logToConsole = true;
+
+var pusher = new Pusher('0caec0623dbc96e698fc', {
+  encrypted: true
+});
+
 class Dashboard extends Component {
 	
 	constructor(props) {
@@ -27,6 +34,42 @@ class Dashboard extends Component {
         this.forceUpdate();
       })
       .catch(e => alert(e.message));
+
+
+		var channel = pusher.subscribe('kiosk');
+    
+    channel.bind('my_event', function(data) {
+      alert(data.message);
+    });
+
+    channel.bind('new_appointment', data => {
+      this.state.queue.push(data);
+      this.forceUpdate();
+    })
+
+    channel.bind('remove_appointment', data => {
+      const { queue } = this.state;
+      
+      for(var i in queue) {
+        if(queue[i]._id === data._id) {
+          this.state.queue.splice(i, 1);
+          this.forceUpdate();
+          return;
+        }
+      }
+    })
+
+    channel.bind('update_appointment', data => {
+      const { queue } = this.state;
+      
+      for(var i in queue) {
+        if(queue[i]._id === data._id) {
+          this.state.queue[i] = data;
+          this.forceUpdate();
+          return;
+        }
+      }
+    })
   }
 	
 
