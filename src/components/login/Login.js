@@ -11,17 +11,17 @@ import {
 import '../../css/Login.css';
 
 class Login extends Component {
-  constructor(props) {
-    super(props);
 
-    this.state = {
-      username: ''
-    }
+  gotoDashboard = () => {
+    this.props.navigator.push({
+      id: 'Dashboard'
+    });
   }
 
   render() {
     return (
-      <Grid>
+
+      <Grid className="Grid">
         <Col md={6} mdOffset={3} className="login-box">
           <Well>
             <h3 className="text-center">MavAdmin</h3>
@@ -37,12 +37,13 @@ class Login extends Component {
               bsStyle="primary"
               className="btn-raised"
               block
-              disabled={this.state.username.length < 1}>
+              onClick={this.gotoDashboard}>
               Go Online
             </Button>
           </Well>
         </Col>
       </Grid>
+
     );
   }
 }
