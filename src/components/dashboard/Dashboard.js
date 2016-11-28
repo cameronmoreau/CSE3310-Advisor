@@ -5,8 +5,30 @@ import {
 } from 'react-bootstrap';
 
 import '../../css/Dashboard.css';
+import { apiCall } from '../../services/api';
 
 class Dashboard extends Component {
+	
+	constructor(props) {
+		super(props);
+		
+		this.state = {
+			queue: []
+		}
+	}
+
+	componentDidMount() {
+    apiCall('/appointments')
+      .then(appointments => {
+        for(const a of appointments) {
+					console.log(a);
+          this.state.queue.push(a);
+        }
+        this.forceUpdate();
+      })
+      .catch(e => alert(e.message));
+  }
+	
 
   nextStudent (){
     
@@ -26,6 +48,8 @@ class Dashboard extends Component {
 
 
   render() {
+		const { queue } = this.state;
+
     return (
 
       <Grid className="Grid">
@@ -34,11 +58,14 @@ class Dashboard extends Component {
             
             <h3 className="text-center">Queue</h3>
               <ListGroup className="List">
-    			<ListGroupItem onClick={this.viewStudent}> Student 1 </ListGroupItem>
-    			<ListGroupItem onClick={this.viewStudent}> Student 2 </ListGroupItem>
-    			<ListGroupItem onClick={this.viewStudent}> Student 3 </ListGroupItem>
-    			<ListGroupItem onClick={this.viewStudent}> Student 4 </ListGroupItem>
-  			  </ListGroup>
+							{ queue.map(item => (
+								<ListGroupItem 
+									key={item._id}
+									onClick={this.viewStudent}>
+									{item.student[0].name}
+								</ListGroupItem>
+							)) }
+  			  	</ListGroup>
   			  
   			  <Button 
 	            bsStyle="primary"
