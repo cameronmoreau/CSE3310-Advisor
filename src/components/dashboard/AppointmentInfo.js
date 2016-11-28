@@ -9,43 +9,38 @@ import {
 
 class AppointmentInfo extends Component {
   render() {
+    const { appointment } = this.props;
+    const student = appointment.student[0];
+
     return (
       <Well>
-        <h3 className="text-center">Student</h3>
+        <h3 className="text-center no-top">Student</h3>
         <Table striped bordered condensed hover>
           <tbody>
             <tr>
-              <td> Advising Category </td>
-              <td> "Drop/Add/Swap/" </td>
+              <td>Advising Category</td>
+              <td>{appointment.description}</td>
+            </tr>
+            <tr>
+              <td>Advising Type</td>
+              <td>{appointment.extraInfo}</td>
+            </tr>
+            <tr>
+              <td>Student Name</td>
+              <td>{ student.name }</td>
             </tr>
             <tr>
               <td>Student ID</td>
-              <td> "1000" </td>
-            </tr>
-            <tr>
-              <td>Degree Program</td>
-              <td> "Computer Science" </td>
+              <td>{student.id}</td>
             </tr>
             <tr>
               <td>UTA Email</td>
-              <td> "first.last@mavs.uta.edu" </td>
+              <td></td>
             </tr>
             <tr>
               <td>Phone</td>
-              <td> "123-456-7890" </td>
-            </tr>
-              <tr>
-              <td> Key </td>
-              <td> Value </td>
-            </tr>
-            <tr>
-              <td> Key </td>
-              <td> Value </td>
-            </tr>
-            <tr>
-              <td> Key </td>
-              <td> Value </td>
-            </tr>    			  
+              <td>{student.phone}</td>
+            </tr>  			  
           </tbody>
         </Table>
 

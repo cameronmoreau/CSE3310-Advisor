@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import {
   Grid, Col, Well, Button, FormGroup, FormControl, ListView, View, Text,
   ListGroup, ListGroupItem, Table, ControlLabel, ScrollView
@@ -24,11 +24,20 @@ class Dashboard extends Component {
 		
 		this.state = {
 			queue: [],
-			selected: null
+			selected: null,
+			advisor: null
 		}
 	}
 
 	componentDidMount() {
+		// Check valid session
+		const advisor = localStorage.getItem('advisor');
+		if(!advisor) {
+      this.context.router.replace('login');
+    } else {
+			this.setState({advisor: JSON.parse(advisor)});
+		}
+
     apiCall('/appointments')
       .then(appointments => {
         for(const a of appointments) {
@@ -77,33 +86,37 @@ class Dashboard extends Component {
   }
 	
 
-  nextStudent (){
-    
+  _nextStudent = () => {
+    this.setState({ selected: 0 });
   }
 
-  viewStudent (){
-
-  }
-
-  submitStudent (){
-    
-  }
-
-  logOut (){
-
+  _logout = () => {
+		const opts = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({username: this.state.advisor.name})
+    }
+		apiCall('/logout', opts)
+			.then(() => {
+				localStorage.removeItem('advisor');
+				this.context.router.replace('login');
+			})
+			.catch(e => alert(e.message));
   }
 
 
   render() {
-		const { queue } = this.state;
+		const { queue, selected, advisor } = this.state;
 
     return (
 
-      <Grid className="Grid">
-        <Col md={4} mdPull={0} className="Queue">
+      <Grid className="Grid dashboard">
+        <Col md={4} mdPull={0}>
           <Well>
             
-            <h3 className="text-center">Queue</h3>
+            <h3 className="text-center no-top">Queue</h3>
               <ListGroup className="List">
 							{ queue.map(item => (
 								<ListGroupItem 
@@ -117,24 +130,35 @@ class Dashboard extends Component {
           
           <Well bsSize="small">
 
-            <Button 
-	          bsStyle="primary"
-	          className="btn-raised"
-	          block
-	          onClick={this.logOut}>
-	          Log Out
-	        </Button>
+						{ advisor && 
+							<p className="text-center">Hello, { advisor.name }</p>	
+						}
 
-	      </Well>
+            <Button 
+							bsStyle="primary"
+							className="btn-raised"
+							block
+							onClick={this._logout}>
+							Log Out
+						</Button>
+
+	      	</Well>
         </Col>
         
 				<Col md={7} mdPush={1} className="CurrentStudent">
-					<AppointmentInfo />
-					<NextStudent />
+					{
+						selected !== null ? 
+						<AppointmentInfo appointment={queue[selected]} />
+						: <NextStudent onClick={this._nextStudent} />
+					}
 				</Col>
       </Grid>
     );
   }
+
+	static contextTypes = {
+    router: PropTypes.object.isRequired
+  };
 }
 
 export default Dashboard;
