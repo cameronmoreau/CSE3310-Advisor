@@ -6,7 +6,8 @@ export const apiCall = (url, options = {}) => {
 }
 
 const validate = (response) => {
-  return response.json().then(res => {
+  return response.text().then(t => {
+    const res = JSON.parse(t || "{}");
     if(response.status >= 200 && response.status < 300) {
       return res;
     } else {

@@ -31,20 +31,30 @@ class Dashboard extends Component {
 
 	componentDidMount() {
 		// Check valid session
-		const advisor = localStorage.getItem('advisor');
+		let advisor = localStorage.getItem('advisor');
 		if(!advisor) {
       this.context.router.replace('login');
     } else {
-			this.setState({advisor: JSON.parse(advisor)});
+      advisor = JSON.parse(advisor);
+			this.setState({advisor});
 		}
 
+    // Get all the appointments
     apiCall('/appointments')
       .then(appointments => {
         for(const a of appointments) {
-					console.log(a);
           this.state.queue.push(a);
         }
         this.forceUpdate();
+      })
+      .catch(e => alert(e.message));
+
+    // get CurrentStudent
+    apiCall(`/advisors/${advisor._id}/current`)
+      .then(apt => {
+        if(apt._id) {
+          this.setState({selected: apt});
+        }
       })
       .catch(e => alert(e.message));
 
@@ -87,7 +97,29 @@ class Dashboard extends Component {
 	
 
   _nextStudent = () => {
-    this.setState({ selected: 0 });
+    const opts = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({advisorId: this.state.advisor._id})
+    }
+    apiCall('/appointments/next', opts)
+      .then(selected => this.setState({selected}))
+      .catch(e => alert(e.message));
+  }
+
+  _finishedStudent = (comment) => {
+    const opts = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({comment})
+    }
+    apiCall(`/appointments/${this.state.selected._id}/done`, opts)
+      .then(selected => this.setState({selected: null}))
+      .catch(e => alert(e.message));
   }
 
   _logout = () => {
@@ -148,7 +180,7 @@ class Dashboard extends Component {
 				<Col md={7} mdPush={1} className="CurrentStudent">
 					{
 						selected !== null ? 
-						<AppointmentInfo appointment={queue[selected]} />
+						<AppointmentInfo appointment={selected} finished={this._finishedStudent} />
 						: <NextStudent onClick={this._nextStudent} />
 					}
 				</Col>

@@ -8,8 +8,16 @@ import {
 } from 'react-bootstrap';
 
 class AppointmentInfo extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      comment: ''
+    }
+  }
+
   render() {
-    const { appointment } = this.props;
+    const { appointment, finished } = this.props;
     const student = appointment.student[0];
 
     return (
@@ -46,15 +54,16 @@ class AppointmentInfo extends Component {
 
         <FormGroup>
           <FormControl 
-          componentClass="textarea" 
-          placeholder="Comments"/>
+            componentClass="textarea"
+            onChange={e => this.setState({comment: e.target.value})} 
+            placeholder="Comments"/>
         </FormGroup>
 
         <Button 
           bsStyle="primary"
           className="btn-raised"
           block
-          onClick={this.submitStudent}>
+          onClick={() => finished(this.state.comment)}>
           Submit
         </Button>
           
